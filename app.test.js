@@ -3,6 +3,9 @@ const app = require("./app");
 const Pokemon = require("./models/pokemon.model");
 const mongoose = require("mongoose");
 const { MongoMemoryServer } = require("mongodb-memory-server");
+const jwt = require("jsonwebtoken")
+
+jest.mock("jsonwebtoken")
 
 mongoose.set("useNewUrlParser", true);
 mongoose.set("useFindAndModify", false);
@@ -47,6 +50,7 @@ describe("pokemons", () => {
     });
 
     afterEach(async () => {
+        jest.resetAllMocks();
         await Pokemon.deleteMany();
     });
 
@@ -73,6 +77,42 @@ describe("pokemons", () => {
                 .expect(200);
             actualPokemons.sort((a, b) => a.id > b.id)
             expect(actualPokemons).toMatchObject(expectedPokemonData);
+        })
+
+        test("GET should return the filtered pokemon name", async () => {
+            const expectedPokemonData = [
+                {
+                    id: 2,
+                    name: "Squirtle",
+                    japaneseName: "ゼニガメ",
+                    baseHP: 44,
+                    category: "Tiny Turtle Pokemon",
+                },
+            ];
+
+            const { body: actualPokemons } = await request(app)
+                .get("/pokemons?name=Sq")
+                .expect(200);
+            expect(actualPokemons).toMatchObject(expectedPokemonData);
+        })
+
+        test("GET should return the pokemon id", async () => {
+            jwt.verify.mockReturnValueOnce({})
+            const expectedPokemonData = [
+                {
+                    id: 2,
+                    name: "Squirtle",
+                    japaneseName: "ゼニガメ",
+                    baseHP: 44,
+                    category: "Tiny Turtle Pokemon",
+                },
+            ];
+
+            const { body: actualPokemons } = await request(app)
+                .get("/pokemons/2")
+                .set("Cookie", "token=valid-token")
+                .expect(200)
+            expect(actualPokemons).toMatchObject(expectedPokemonData)
         })
 
         // test("PUT should return with error 404 when reuired name was not given", async () => {
