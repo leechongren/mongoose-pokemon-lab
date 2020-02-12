@@ -62,9 +62,9 @@ router.delete("/:id", async (req, res) => {
 
 router.use((err, req, res, next) => {
     if (err.name === "ValidationError") {
-        err.code = 400;
+        err.statusCode = 400;
     } else if (err.name === "MongoError") {
-        err.code = 422;
+        err.statusCode = 422;
     }
     next(err)
 })

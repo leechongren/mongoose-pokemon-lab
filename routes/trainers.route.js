@@ -76,4 +76,13 @@ router.post("/login", async (req, res, next) => {
 
 })
 
+router.use((err, req, res, next) => {
+    if (err.name === "ValidationError") {
+        err.statusCode = 400;
+    } else if (err.name === "MongoError") {
+        err.statusCode = 422;
+    }
+    next(err)
+})
+
 module.exports = router

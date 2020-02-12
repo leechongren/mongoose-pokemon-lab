@@ -62,17 +62,17 @@ describe('/', () => {
             expect(trainer.password).not.toBe("iWannaB3DVeryBest")
         })
 
-        // it("POST should not add a new user when password is less than 8", async () => {
-        //     const wrongTrainer = {
-        //         username: "wrongTrainer",
-        //         password: 1234567
-        //     }
-        //     const { body: error } = await request(app)
-        //         .post("/trainers/register")
-        //         .send(wrongTrainer)
-        //         .expect(404)
-        //     expect(error.error).toContain("")
-        // })
+        it("POST should not add a new user when password is less than 8", async () => {
+            const wrongTrainer = {
+                username: "wrongTrainer",
+                password: 1234567
+            }
+            const { body: error } = await request(app)
+                .post("/trainers/register")
+                .send(wrongTrainer)
+                .expect(400)
+            expect(error.error).toContain("Trainer validation failed")
+        })
 
 
         test("GET should respond with correct trainer details when correct trainer", async () => {
